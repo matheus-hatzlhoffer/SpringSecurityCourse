@@ -1,10 +1,10 @@
-package com.hatzlhoffer.springsecuritybasic;
+package com.hatzlhoffer.easybank;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringsecuritybasicApplicationTests {
+class EasyBankApplicationTests {
 
 	@Test
 	void contextLoads() {
