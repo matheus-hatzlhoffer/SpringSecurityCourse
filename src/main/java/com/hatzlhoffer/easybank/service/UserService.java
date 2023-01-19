@@ -8,24 +8,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.hatzlhoffer.easybank.model.User;
-import com.hatzlhoffer.easybank.repository.UserRepository;
+import com.hatzlhoffer.easybank.model.Customer;
+import com.hatzlhoffer.easybank.repository.CustomerRepository;
 
 @Service
 public class UserService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private CustomerRepository customerRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        User user;
+        Optional<Customer> optionalCustomer = customerRepository.findByEmail(username);
+        Customer customer;
         try {
-            user = optionalUser.get();
+            customer = optionalCustomer.get();
         } catch (Exception e) {
             throw new UsernameNotFoundException("User details not found for the user: " + username);
         }
-        return user;
+        return customer;
     }
 }
