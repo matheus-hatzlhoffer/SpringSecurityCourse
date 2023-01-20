@@ -29,7 +29,7 @@ public class UserController {
     public ResponseEntity<String> singUp(@RequestBody Customer customer) {
         ResponseEntity<String> response;
         try {
-            String hashPassword = passwordEncoder.encode(customer.getPassword());
+            String hashPassword = passwordEncoder.encode(customer.getPwd());
             Customer newCustomer = new Customer(customer.getName(), customer.getEmail(), customer.getMobileNumber(),
                     hashPassword, customer.getRole());
             customerRepository.save(newCustomer);

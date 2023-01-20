@@ -1,23 +1,24 @@
 package com.hatzlhoffer.easybank.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-public class Customer implements UserDetails {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
@@ -34,6 +35,10 @@ public class Customer implements UserDetails {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String pwd;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    private Set<Authority> authorities;
 
     private String role;
 
@@ -108,38 +113,16 @@ public class Customer implements UserDetails {
         this.createDt = createDt;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
-    @Override
-    public String getPassword() {
-        return this.pwd;
+    public Set<Authority> getAuth() {
+        return this.authorities;
     }
 
-    @Override
-    public String getUsername() {
-        return this.email;
+    public Set<Authority> getAuthorities() {
+        return authorities;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
