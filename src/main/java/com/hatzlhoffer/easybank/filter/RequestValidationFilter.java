@@ -7,6 +7,7 @@ import java.util.Base64;
 
 import org.springframework.util.StringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -27,7 +28,7 @@ public class RequestValidationFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        String header = req.getHeader(AUTHENTICATION_SCHEME_BASIC);
+        String header = req.getHeader(AUTHORIZATION);
 
         if (header != null) {
             header = header.trim();
@@ -44,7 +45,6 @@ public class RequestValidationFilter implements Filter {
                     }
                     String email = token.substring(0, delim);
                     if (email.toLowerCase().contains("test")) {
-                        System.out.println("TEM TESTE AQUI!!!!!!!!!!!!!!!!!!!!");
                         res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         return;
                     }
