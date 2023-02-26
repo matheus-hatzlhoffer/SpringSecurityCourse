@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.hatzlhoffer.easybank.filter.CsrfCookieFilter;
 import com.hatzlhoffer.easybank.filter.RequestValidationFilter;
+import com.hatzlhoffer.easybank.filter.AuthoritiesLoggingFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -46,7 +47,9 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/contact", "/auth/signup")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new RequestValidationFilter(), BasicAuthenticationFilter.class).authorizeHttpRequests()
+                .addFilterBefore(new RequestValidationFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests()
                 .requestMatchers("/myaccount").hasRole("USER")
                 .requestMatchers("/mybalance").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/myloans").hasRole("USER")
