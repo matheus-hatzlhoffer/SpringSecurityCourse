@@ -32,23 +32,21 @@ public class EasyBankAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
-        Optional<Customer> optionalUser = customerRepository.findByEmail(username);
-        if (optionalUser.isPresent()) {
-            Customer user = optionalUser.get();
-            if (passwordEncoder.matches(password, user.getPwd())) {
-                List<GrantedAuthority> authorities = getGrantedAuthority(user.getAuth());
-                return new UsernamePasswordAuthenticationToken(username, password, authorities);
+        String pwd = authentication.getCredentials().toString();
+        Optional<Customer> customer = customerRepository.findByEmail(username);
+        if (customer.isPresent()) {
+            if (passwordEncoder.matches(pwd, customer.get().getPwd())) {
+                return new UsernamePasswordAuthenticationToken(username, pwd,
+                        getGrantedAuthorities(customer.get().getAuthorities()));
             } else {
-                throw new BadCredentialsException("Invalid password");
+                throw new BadCredentialsException("Invalid password!");
             }
-
         } else {
-            throw new BadCredentialsException("No user registered with this username");
+            throw new BadCredentialsException("No user registered with this details!");
         }
     }
 
-    private List<GrantedAuthority> getGrantedAuthority(Set<Authority> authorities) {
+    private List<GrantedAuthority> getGrantedAuthorities(Set<Authority> authorities) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (Authority authority : authorities) {
             grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
@@ -58,6 +56,7 @@ public class EasyBankAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
+
 }

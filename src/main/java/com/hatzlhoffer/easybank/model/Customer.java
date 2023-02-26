@@ -16,9 +16,10 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-public class Customer {
+public class Customer implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
@@ -117,12 +118,38 @@ public class Customer {
         this.authorities = authorities;
     }
 
-    public Set<Authority> getAuth() {
+    public Set<Authority> getAuthorities() {
         return this.authorities;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
+    @Override
+    public String getPassword() {
+        return this.pwd;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }
