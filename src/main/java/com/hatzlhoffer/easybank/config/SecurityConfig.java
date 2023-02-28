@@ -1,5 +1,6 @@
 package com.hatzlhoffer.easybank.config;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.hatzlhoffer.easybank.filter.CsrfCookieFilter;
 import com.hatzlhoffer.easybank.filter.RequestValidationFilter;
+import com.hatzlhoffer.easybank.constants.SecurityConstants;
 import com.hatzlhoffer.easybank.filter.AuthoritiesLoggingFilter;
 import com.hatzlhoffer.easybank.filter.LoggingFilter;
+import com.hatzlhoffer.easybank.filter.JWTGeneratorFilter;
+import com.hatzlhoffer.easybank.filter.JWTValidationFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,8 +34,7 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.securityContext().requireExplicitSave(false)
-                .and().sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .cors().configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -40,6 +43,7 @@ public class SecurityConfig {
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
+                        config.setExposedHeaders(Arrays.asList(SecurityConstants.JWT_HEADER));
                         config.setMaxAge(3600L);
                         return config;
                     }
@@ -49,8 +53,10 @@ public class SecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTValidationFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new LoggingFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTGeneratorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers("/myaccount").hasRole("USER")
                 .requestMatchers("/mybalance").hasAnyRole("USER", "ADMIN")
