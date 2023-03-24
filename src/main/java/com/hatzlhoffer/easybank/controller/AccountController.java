@@ -16,10 +16,8 @@ public class AccountController {
 
     @GetMapping("/myaccount")
     public Accounts getMyAccount(@RequestParam int id) {
-        System.out.println("Here");
         Accounts accounts = accountsRepository.findByCustomerId(id);
         if (accounts != null) {
-            System.out.println("Here2");
             return accounts;
         } else {
             return null;

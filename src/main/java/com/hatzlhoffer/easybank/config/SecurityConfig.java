@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,8 +36,8 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .cors().configurationSource(new CorsConfigurationSource() {
+        http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
@@ -47,7 +49,7 @@ public class SecurityConfig {
                         config.setMaxAge(3600L);
                         return config;
                     }
-                }).and()
+                }))
                 .csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers("/contact", "/auth/signup")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
@@ -64,8 +66,7 @@ public class SecurityConfig {
                 .requestMatchers("/mycards").hasRole("USER")
                 .requestMatchers("/auth").authenticated()
                 .requestMatchers("/notices", "/contact", "/auth/signup").permitAll()
-                .and().formLogin()
-                .and().httpBasic();
+                .and().formLogin(withDefaults()).httpBasic(withDefaults());
         return http.build();
     }
 
