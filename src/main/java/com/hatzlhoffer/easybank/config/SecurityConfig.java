@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/myaccount").hasRole("USER")
                 .requestMatchers("/mybalance").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/myloans").hasRole("USER")
+                .requestMatchers("/myloans").authenticated()
                 .requestMatchers("/mycards").hasRole("USER")
                 .requestMatchers("/auth").authenticated()
                 .requestMatchers("/notices", "/contact", "/auth/signup").permitAll()
